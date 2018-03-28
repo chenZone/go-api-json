@@ -4,13 +4,8 @@ import "os/exec"
 import "fmt"
 import "time"
 
-func check(e error) {
-	if e != nil {
-		panic(e)
-	}
-}
 
-func scrapy_data() {
+func Scrapy_data() {
 
 		start := time.Now()
 		cmd := exec.Command("bash", "-c", "cd /root/feixiaohao-spider/feixiaohao && scrapy crawl feixiao")
