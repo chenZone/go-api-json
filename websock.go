@@ -96,6 +96,8 @@ func home(w http.ResponseWriter, r *http.Request){
 		if string(msg) == "ping" {
 			if count != 1{
 				Get_data()
+				Scrapy_data()
+				
 				datass := Return_json()
 				fmt.Println("first_received")
 				err = conn.WriteMessage(msgType,datass)
@@ -103,13 +105,13 @@ func home(w http.ResponseWriter, r *http.Request){
 			}else{
 
 			
-			Scrapy_data()
 			Get_data()
 			datass := Return_json()
 			fmt.Println("received")
 			err = conn.WriteMessage(msgType,datass)
 			check(err)
 			}
+			count++
 		} else {
 			conn.Close()
 			fmt.Println(string(msg))
