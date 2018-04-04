@@ -12,6 +12,7 @@ import "bytes"
 import "io/ioutil"
 import "./Redis"
 import "./scrapy"
+import "./ipsave"
 func check(e error){
 	if e != nil{
 		panic(e)
@@ -44,10 +45,19 @@ func HttpCurrentDataGet(w http.ResponseWriter, r *http.Request) {
 		DB: 1,
 	})
 	defer client.Close()
-	p,_ :=client.Get("USD").Result()
-	data := make(map[string]string)
-	data["USD"]=p
-	json.NewEncoder(w).Encode(data)
+
+//获取clien_ip:
+	xrealip := ipsave.RemoteIp(r)
+	fmt.Println(xrealip)
+	allow := ipsave.IpLimit(xrealip)
+	if allow==true{
+		p,_ :=client.Get("USD").Result()
+		data := make(map[string]string)
+		data["USD"]=p
+		json.NewEncoder(w).Encode(data)
+	}else{
+		w.Write([]byte("you are done!"))
+	}
 }
 //websocket 提供btc即时行情
 func WebsocketCurrentDataGet(w http.ResponseWriter, r *http.Request) {
