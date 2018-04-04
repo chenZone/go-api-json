@@ -49,14 +49,19 @@ func HttpCurrentDataGet(w http.ResponseWriter, r *http.Request) {
 //获取clien_ip:
 	xrealip := ipsave.RemoteIp(r)
 	fmt.Println(xrealip)
-	allow := ipsave.IpLimit(xrealip)
-	if allow==true{
-		p,_ :=client.Get("USD").Result()
-		data := make(map[string]string)
-		data["USD"]=p
-		json.NewEncoder(w).Encode(data)
+	allowsecond := ipsave.IpLimitSecond(xrealip)
+	if allowsecond==true{
+		allowminute := ipsave.IpLimitMinute(xrealip)
+		if allowminute==true{
+			p,_ :=client.Get("USD").Result()
+			data := make(map[string]string)
+			data["USD"]=p
+			json.NewEncoder(w).Encode(data)
+		}else{
+			w.Write([]byte("minute down"))
+		}
 	}else{
-		w.Write([]byte("you are done!"))
+		w.Write([]byte("second down"))
 	}
 }
 //websocket 提供btc即时行情
@@ -97,40 +102,86 @@ func WebsocketCurrentDataGet(w http.ResponseWriter, r *http.Request) {
 
 //获取btc指定日期行情(美元)
 func HttpHistoryDataGet(w http.ResponseWriter, r *http.Request){
-	params := mux.Vars(r)
-	params_int,_ := strconv.ParseInt(params["time"],10,0)
-	session, _ := mgo.Dial("127.0.0.1:27017")
-	defer session.Close()
-	session.SetMode(mgo.Monotonic,true)
-	conn := session.DB("history").C("price")
-	var price Price
-	conn.Find(bson.M{"time":params_int}).One(&price)
-	json.NewEncoder(w).Encode(price)
+
+//获取clien_ip:
+	xrealip := ipsave.RemoteIp(r)
+	fmt.Println(xrealip)
+	allowsecond := ipsave.IpLimitSecond(xrealip)
+	if allowsecond==true{
+		allowminute := ipsave.IpLimitMinute(xrealip)
+		if allowminute==true{
+			params := mux.Vars(r)
+			params_int,_ := strconv.ParseInt(params["time"],10,0)
+			session, _ := mgo.Dial("127.0.0.1:27017")
+			defer session.Close()
+			session.SetMode(mgo.Monotonic,true)
+			conn := session.DB("history").C("price")
+			var price Price
+			conn.Find(bson.M{"time":params_int}).One(&price)
+			json.NewEncoder(w).Encode(price)
+		}else{
+			w.Write([]byte("minute down"))
+		}
+
+	}else{
+		w.Write([]byte("second down"))
+}
 }
 //获取切片数据(时间范围)
 func HttpHistoryDataGetSlice(w http.ResponseWriter, r *http.Request){
-	params := mux.Vars(r)
-	start_int,_ := strconv.ParseInt(params["startTime"],10,0)
-	end_int,_ := strconv.ParseInt(params["endTime"],10,0)
-	session,_ := mgo.Dial("127.0.0.1:27017")
-	defer session.Close()
-	session.SetMode(mgo.Monotonic,true)
-	conn := session.DB("history").C("price")
-	var price []Price
-	conn.Find(bson.M{"time":bson.M{"$gte": start_int,"$lte":end_int}}).All(&price)
-	json.NewEncoder(w).Encode(price)
-	fmt.Println(start_int,end_int)
+	xrealip := ipsave.RemoteIp(r)
+	fmt.Println(xrealip)
+	allowsecond := ipsave.IpLimitSecond(xrealip)
+	if allowsecond==true{
+		allowminute := ipsave.IpLimitMinute(xrealip)
+		if allowminute==true{
+			params := mux.Vars(r)
+			start_int,_ := strconv.ParseInt(params["startTime"],10,0)
+			end_int,_ := strconv.ParseInt(params["endTime"],10,0)
+			session,_ := mgo.Dial("127.0.0.1:27017")
+			defer session.Close()
+			session.SetMode(mgo.Monotonic,true)
+			conn := session.DB("history").C("price")
+			var price []Price
+			conn.Find(bson.M{"time":bson.M{"$gte": start_int,"$lte":end_int}}).All(&price)
+			json.NewEncoder(w).Encode(price)
+			fmt.Println(start_int,end_int)
+		}else{
+			w.Write([]byte("minute down"))
+		}
+
+	}else{
+		w.Write([]byte("second down"))
+}
+
+
 }
 //获取btc全部历史数据
 func HttpHistoryDataGetAll(w http.ResponseWriter, r *http.Request){
-	session, _ := mgo.Dial("127.0.0.1:27017")
-	defer session.Close()
-	session.SetMode(mgo.Monotonic,true)
-	conn := session.DB("history").C("price")
-	var priceAll []Price
-	conn.Find(nil).All(&priceAll)
-	json.NewEncoder(w).Encode(priceAll)
+	xrealip := ipsave.RemoteIp(r)
+	fmt.Println(xrealip)
+	allowsecond := ipsave.IpLimitSecond(xrealip)
+	if allowsecond==true{
+		allowminute := ipsave.IpLimitMinute(xrealip)
+		if allowminute==true{
+			session, _ := mgo.Dial("127.0.0.1:27017")
+			defer session.Close()
+			session.SetMode(mgo.Monotonic,true)
+			conn := session.DB("history").C("price")
+			var priceAll []Price
+			conn.Find(nil).All(&priceAll)
+			json.NewEncoder(w).Encode(priceAll)
+		}else{
+			w.Write([]byte("minute down"))
+		}
+
+	}else{
+		w.Write([]byte("second down"))
 }
+}
+
+
+
 
 
 //获取全部货币即时行情
@@ -158,8 +209,23 @@ func WebsocketAllCurrentDataGet(w http.ResponseWriter, r *http.Request){
 }
 //获取全部货币即时行情http
 func HttpAllCurrentDataGet(w http.ResponseWriter, r *http.Request){
-	FinalData :=test.ScrapyDataGet()
-	json.NewEncoder(w).Encode(FinalData)
+
+	xrealip := ipsave.RemoteIp(r)
+	fmt.Println(xrealip)
+	allowsecond := ipsave.IpLimitSecond(xrealip)
+	if allowsecond==true{
+		allowminute := ipsave.IpLimitMinute(xrealip)
+		if allowminute==true{
+			FinalData :=test.ScrapyDataGet()
+			json.NewEncoder(w).Encode(FinalData)
+		}else{
+			w.Write([]byte("minute down"))
+		}
+
+	}else{
+		w.Write([]byte("second down"))
+}
+
 }
 
 func main(){
