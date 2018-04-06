@@ -240,5 +240,5 @@ func main(){
 	router.HandleFunc("/current_data/websocket",WebsocketCurrentDataGet).Methods("GET")
 	router.HandleFunc("/allcoin_current",HttpAllCurrentDataGet)
 	router.HandleFunc("/allcoin_current/websocket",WebsocketAllCurrentDataGet)
-	http.ListenAndServe("127.0.0.1:8080",router)
+	http.ListenAndServe("0.0.0.0:8080",router)
 }
